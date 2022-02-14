@@ -3,15 +3,12 @@ from django.core import serializers
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 
-# Create your views here.
 from .models import Employee, Position, Place, AdvertisementType
 from .utils import dict_from_queryset
 
 
 def index(request):
-    for p in list(Employee.objects.all()):
-        print(p.fullname)
-    return HttpResponse('Hello world')
+    return HttpResponse(render(request, 'advagency/index.html'))
 
 
 def employment_department(request, position_code=None):
@@ -24,7 +21,7 @@ def employment_department(request, position_code=None):
         pos_employees = dict_from_queryset(Employee.objects.filter(position_code=p['code']))
         p['employees'] = pos_employees
 
-    print(positions)  # dict of needed info
+    print(positions)
     context = {
         'positions': positions,
         'all_positions': all_positions,
@@ -39,7 +36,10 @@ def places_handler(request):
     for p in places:
         print(p)
         p['type'] = dict_from_queryset(AdvertisementType.objects.filter(code=p['type_code_id']))[0]
-    return HttpResponse(places)
+    context = {
+        'places': places,
+    }
+    return HttpResponse(render(request, 'advagency/places.html', context))
 
 
 def places_types(request, type_code=None):
